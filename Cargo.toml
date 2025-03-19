@@ -1,9 +1,10 @@
 [package]
 name = "suffixarrayview"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2024"
 authors = ["Frank Schwidom"]
 description = "Creates a view of a suffix array"
+license = "Apache-2.0"
 license-file = "LICENSE"
 homepage = "https://github.com/schwidom/suffixarrayview"
 readme = "README.txt"
