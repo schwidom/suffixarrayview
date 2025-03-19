@@ -57,7 +57,11 @@ struct Args {
 
  // #[arg(short, long, help = "defaults to '\\n'")]
  // datasetend: Option<String>,
- #[arg(short, long, help = "default is every char / byte, defines ")]
+ #[arg(
+  short,
+  long,
+  help = "default is every char / byte, defines the start of all suffixes"
+ )]
  tokenregex: Option<String>,
 
  #[arg(short, long)]
