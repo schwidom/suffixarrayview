@@ -19,6 +19,7 @@ use clap::Parser;
 use regex::Regex;
 
 #[derive(Parser, Debug)]
+#[command(version)]
 struct Args {
  // #[arg(
  //  short,
