@@ -1,11 +1,11 @@
 [package]
 name = "suffixarrayview"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2024"
 authors = ["Frank Schwidom"]
 description = "Creates a view of a suffix array"
 license-file = "LICENSE"
-homepage = "https://github.com/schwidom/clipboardstealer"
+homepage = "https://github.com/schwidom/suffixarrayview"
 readme = "README.txt"
 
 
