@@ -45,12 +45,12 @@ struct Args {
  #[arg(short, long, help = "binary mode, default is UTF8 mode")]
  binary: bool,
 
- #[arg(
-  short,
-  long,
-  help = "input regex, without this regex every suffix goes to the end of the file"
- )]
- regex: Option<String>,
+ // #[arg(
+ //  short,
+ //  long,
+ //  help = "input regex, without this regex every suffix goes to the end of the file"
+ // )]
+ // regex: Option<String>,
 
  // #[arg(short, long, help = "converts every '\\n' to ' '")]
  // endoflinetospace: bool,
