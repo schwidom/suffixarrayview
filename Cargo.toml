@@ -1,0 +1,15 @@
+[package]
+name = "suffixarrayview"
+version = "0.1.0"
+edition = "2024"
+authors = ["Frank Schwidom"]
+description = "Creates a view of a suffix array"
+license-file = "LICENSE"
+homepage = "https://github.com/schwidom/clipboardstealer"
+readme = "README.txt"
+
+
+[dependencies]
+clap = { version = "4.5.32", features = ["derive"] }
+regex = "1.11.1"
+serde = { version = "1.0.219", features = ["derive"] }
