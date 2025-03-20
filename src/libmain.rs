@@ -33,6 +33,9 @@ struct Args {
  #[arg(short, long, help = "shows the filenames")]
  filename: bool,
 
+ #[arg(short, long, help = "shows the filename indices")]
+ index: bool,
+
  #[arg(
   short,
   long,
@@ -76,10 +79,10 @@ enum FData<'a> {
 }
 
 impl<'a> FData<'a> {
- fn get_filename(&self) -> &'a str {
+ fn get_filename(&self) -> &FileName<'a> {
   match self {
-   FData::B(fdata_binary) => fdata_binary.filename,
-   FData::S(fdata_string) => fdata_string.filename,
+   FData::B(fdata_binary) => &fdata_binary.fln,
+   FData::S(fdata_string) => &fdata_string.fln,
   }
  }
 
@@ -95,13 +98,19 @@ impl<'a> FData<'a> {
  }
 }
 
-struct FDataBinary<'a> {
+// TODO : index
+#[derive(Clone, Debug)]
+struct FileName<'a> {
  filename: &'a str,
+}
+
+struct FDataBinary<'a> {
+ fln: FileName<'a>,
  data: Vec<u8>,
 }
 
 struct FDataString<'a> {
- filename: &'a str,
+ fln: FileName<'a>,
  data: String,
  // utf8data: Vec<char>,
  char_to_byte_offset: Vec<usize>,
@@ -111,9 +120,10 @@ struct FDataString<'a> {
 impl<'a> FDataBinary<'a> {
  fn new(filename: &'a str) -> Result<Self, Box<dyn Error>> {
   // let mut fd = File::open(filename)?;
+  let fln = FileName { filename };
   let data = read(&filename)?;
 
-  Ok(Self { filename, data })
+  Ok(Self { fln, data })
  }
 
  fn create_filepointers(
@@ -124,7 +134,7 @@ impl<'a> FDataBinary<'a> {
   // TODO : fehler, wenn tokenregex != None ist
 
   if args.verbose {
-   eprintln!("creating suffixes {}", self.filename);
+   eprintln!("creating suffixes {}", self.fln.filename);
   }
 
   let l = self.data.len();
@@ -158,8 +168,9 @@ impl<'a> FDataString<'a> {
    }
   }
 
+  let fln = FileName { filename };
   Ok(Self {
-   filename,
+   fln,
    data,
    // utf8data,
    char_to_byte_offset,
@@ -174,7 +185,7 @@ impl<'a> FDataString<'a> {
  ) -> Result<Box<dyn Iterator<Item = FilePointer<'a>> + 'a>, Box<dyn Error>> {
   if let Some(tr) = tokenregex {
    if args.verbose {
-    eprintln!("creating suffixes with token regex {}", self.filename);
+    eprintln!("creating suffixes with token regex {}", self.fln.filename);
    }
    let l = self.data.chars().count();
    let it = tr.find_iter(&self.data);
@@ -184,7 +195,7 @@ impl<'a> FDataString<'a> {
    })))
   } else {
    if args.verbose {
-    eprintln!("creating suffixes {}", self.filename);
+    eprintln!("creating suffixes {}", self.fln.filename);
    }
 
    let l = self.data.chars().count();
@@ -341,10 +352,13 @@ pub fn main() -> Result<(), Box<dyn Error>> {
     )
    }
   };
-  let filename = match filepointer.fdata {
-   FData::B(b) => b.filename,
-   FData::S(s) => s.filename,
-  };
+
+  // let filename = match filepointer.fdata {
+  //  FData::B(b) => b.filename,
+  //  FData::S(s) => s.filename,
+  // };
+
+  let filename = filepointer.fdata.get_filename().filename;
 
   if args.filename {
    print!("{} ", filename);
