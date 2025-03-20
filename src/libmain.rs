@@ -101,6 +101,7 @@ impl<'a> FData<'a> {
 // TODO : index
 #[derive(Clone, Debug)]
 struct FileName<'a> {
+ idx: usize,
  filename: &'a str,
 }
 
@@ -118,11 +119,8 @@ struct FDataString<'a> {
 }
 
 impl<'a> FDataBinary<'a> {
- fn new(filename: &'a str) -> Result<Self, Box<dyn Error>> {
-  // let mut fd = File::open(filename)?;
-  let fln = FileName { filename };
-  let data = read(&filename)?;
-
+ fn new(fln: FileName<'a>) -> Result<Self, Box<dyn Error>> {
+  let data = read(&fln.filename)?;
   Ok(Self { fln, data })
  }
 
@@ -146,12 +144,12 @@ impl<'a> FDataBinary<'a> {
 }
 
 impl<'a> FDataString<'a> {
- fn new(filename: &'a str) -> Result<Self, Box<dyn Error>> {
-  let data = read_to_string(&filename)?;
-  Self::from_bogus(filename, data)
+ fn new(fln: FileName<'a>) -> Result<Self, Box<dyn Error>> {
+  let data = read_to_string(&fln.filename)?;
+  Self::from_bogus(fln, data)
  }
 
- fn from_bogus(filename: &'a str, data: String) -> Result<Self, Box<dyn Error>> {
+ fn from_bogus(fln: FileName<'a>, data: String) -> Result<Self, Box<dyn Error>> {
   // let data = read_to_string(&filename)?;
   // let utf8data = data.chars().collect::<Vec<_>>();
   let mut char_to_byte_offset: Vec<_> = data.char_indices().map(|x| x.0).collect();
@@ -168,7 +166,6 @@ impl<'a> FDataString<'a> {
    }
   }
 
-  let fln = FileName { filename };
   Ok(Self {
    fln,
    data,
@@ -284,15 +281,16 @@ pub fn main() -> Result<(), Box<dyn Error>> {
 
  let mut filedata = vec![];
 
- for filename in &args.files {
+ for (idx, filename) in args.files.iter().enumerate() {
   if args.verbose {
    eprintln!("reading {}", filename);
   }
 
+  let fln = FileName { idx, filename };
   if args.binary {
-   filedata.push(FData::B(Box::leak(Box::new(FDataBinary::new(filename)?))));
+   filedata.push(FData::B(Box::leak(Box::new(FDataBinary::new(fln)?))));
   } else {
-   filedata.push(FData::S(Box::leak(Box::new(FDataString::new(filename)?))));
+   filedata.push(FData::S(Box::leak(Box::new(FDataString::new(fln)?))));
   }
  }
 
@@ -358,10 +356,13 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   //  FData::S(s) => s.filename,
   // };
 
-  let filename = filepointer.fdata.get_filename().filename;
+  let fln = filepointer.fdata.get_filename();
 
+  if args.index {
+   print!("{} ", fln.idx);
+  }
   if args.filename {
-   print!("{} ", filename);
+   print!("{} ", fln.filename);
   }
   println!("{}", data2print);
  }
@@ -371,6 +372,8 @@ pub fn main() -> Result<(), Box<dyn Error>> {
 
 #[cfg(test)]
 mod tests {
+ use crate::libmain::FileName;
+
  use super::FDataString;
 
  #[test]
@@ -388,7 +391,14 @@ mod tests {
  #[test]
  fn test_002() {
   let s = "⡌⠁⠧⠑ ⠼⠁⠒  ⡍⠜⠇⠑⠹⠰⠎ ⡣⠕⠌"; // chars : 21
-  let fds = FDataString::from_bogus("testfile", s.to_owned()).unwrap();
+  let fds = FDataString::from_bogus(
+   FileName {
+    idx: 0,
+    filename: "testfile",
+   },
+   s.to_owned(),
+  )
+  .unwrap();
   assert_eq!(
    &vec![
     0usize, 3, 6, 9, 12, 13, 16, 19, 22, 23, 24, 27, 30, 33, 36, 39, 42, 45, 46, 49, 52, 55
