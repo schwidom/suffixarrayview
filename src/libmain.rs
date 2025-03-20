@@ -30,6 +30,16 @@ struct Args {
 
  // #[arg(short, long, help = "like uniq but prefixes a count number")]
  // count_unique: bool,
+ #[arg(short, long, help = "align the output ro the right")]
+ right: bool,
+
+ #[arg(
+  short,
+  long,
+  help = "align the output to the left -l and -r is treated as -l"
+ )]
+ left: bool,
+
  #[arg(short, long, help = "shows the filenames")]
  filename: bool,
 
@@ -325,6 +335,32 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   (FData::S(a1), FData::S(b1)) => a1.data[a.byte_offset..].cmp(&b1.data[b.byte_offset..]),
  });
 
+ let alignments = {
+  if args.right || args.left {
+   let mut res = vec![];
+
+   for fd in &filedata {
+    let fln = fd.get_filename();
+
+    let idxlen = format!("{}", fln.idx).chars().count();
+    let fnlen = format!("{}", fln.filename).chars().count();
+    res.push((idxlen, fnlen));
+   }
+
+   let idxlenmax = res.iter().map(|x| x.0).max().unwrap();
+   let fnlenmax = res.iter().map(|x| x.1).max().unwrap();
+
+   Some(
+    res
+     .iter()
+     .map(|x| (" ".repeat(idxlenmax - x.0), " ".repeat(fnlenmax - x.1)))
+     .collect::<Vec<_>>(),
+   )
+  } else {
+   None
+  }
+ };
+
  for filepointer in filepointers {
   // let r = [filepointer.byte_offset..max( filepointer.byte_offset, min(usize
   let data2print = match filepointer.fdata {
@@ -359,11 +395,30 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   let fln = filepointer.fdata.get_filename();
 
   if args.index {
+   if (args.left || args.right) {
+    if let Some(al) = &alignments {
+     print!("{}", al[fln.idx].0)
+    }
+   }
    print!("{} ", fln.idx);
   }
+
   if args.filename {
+   if let Some(al) = &alignments {
+    if args.right && !args.left {
+     print!("{}", al[fln.idx].1)
+    }
+   }
+
    print!("{} ", fln.filename);
+
+   if let Some(al) = &alignments {
+    if args.left {
+     print!("{}", al[fln.idx].1)
+    }
+   }
   }
+
   println!("{}", data2print);
  }
 
