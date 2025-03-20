@@ -30,12 +30,9 @@ struct Args {
 
  // #[arg(short, long, help = "like uniq but prefixes a count number")]
  // count_unique: bool,
+ #[arg(short, long, help = "shows the filenames")]
+ filename: bool,
 
- // #[arg(short, long, help = "shows the filenames always")]
- // filename: bool,
-
- // #[arg(short, long, help = "shows the filenames never")]
- // nofilename: bool,
  #[arg(
   short,
   long,
@@ -321,14 +318,14 @@ pub fn main() -> Result<(), Box<dyn Error>> {
 
  for filepointer in filepointers {
   // let r = [filepointer.byte_offset..max( filepointer.byte_offset, min(usize
-  match filepointer.fdata {
+  let data2print = match filepointer.fdata {
    // TODO : hex output
    FData::B(b) => {
     let r_end = match args.width {
      Some(w) => max(filepointer.byte_offset, min(b.data.len(), filepointer.byte_offset + w)),
      None => b.data.len(),
     };
-    println!("{:?}", &b.data[filepointer.byte_offset..r_end])
+    format!("{:?}", &b.data[filepointer.byte_offset..r_end])
    }
    FData::S(s) => {
     let r_end = match args.width {
@@ -336,14 +333,23 @@ pub fn main() -> Result<(), Box<dyn Error>> {
      None => s.data.len(),
     };
 
-    println!(
+    format!(
      "{}",
      s.data[filepointer.byte_offset..r_end]
       .to_string()
       .replace("\n", " ")
     )
    }
+  };
+  let filename = match filepointer.fdata {
+   FData::B(b) => b.filename,
+   FData::S(s) => s.filename,
+  };
+
+  if args.filename {
+   print!("{} ", filename);
   }
+  println!("{}", data2print);
  }
 
  Ok(())
