@@ -40,11 +40,17 @@ struct Args {
  )]
  left: bool,
 
+ // iqeg9jggza
+ #[arg(short, long, help = "shows the filename indices")]
+ index: bool,
+
+ // cczwcifhkq
  #[arg(short, long, help = "shows the filenames")]
  filename: bool,
 
- #[arg(short, long, help = "shows the filename indices")]
- index: bool,
+ // xulmgekuwa
+ #[arg(short, long, help = "offset in bytes")]
+ offset: bool,
 
  #[arg(
   short,
@@ -93,6 +99,20 @@ impl<'a> FData<'a> {
   match self {
    FData::B(fdata_binary) => &fdata_binary.fln,
    FData::S(fdata_string) => &fdata_string.fln,
+  }
+ }
+
+ fn count(&self) -> usize {
+  match self {
+   FData::B(fdata_binary) => fdata_binary.data.len(),
+   FData::S(fdata_string) => fdata_string.data.chars().count(),
+  }
+ }
+
+ fn len(&self) -> usize {
+  match self {
+   FData::B(fdata_binary) => fdata_binary.data.len(),
+   FData::S(fdata_string) => fdata_string.data.len(),
   }
  }
 
@@ -361,6 +381,7 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   }
  };
 
+ // output
  for filepointer in filepointers {
   // let r = [filepointer.byte_offset..max( filepointer.byte_offset, min(usize
   let data2print = match filepointer.fdata {
@@ -400,6 +421,8 @@ pub fn main() -> Result<(), Box<dyn Error>> {
      print!("{}", al[fln.idx].0)
     }
    }
+   // iqeg9jggza
+
    print!("{} ", fln.idx);
   }
 
@@ -410,6 +433,7 @@ pub fn main() -> Result<(), Box<dyn Error>> {
     }
    }
 
+   // cczwcifhkq
    print!("{} ", fln.filename);
 
    if let Some(al) = &alignments {
@@ -417,6 +441,11 @@ pub fn main() -> Result<(), Box<dyn Error>> {
      print!("{}", al[fln.idx].1)
     }
    }
+  }
+
+  if args.offset {
+   // xulmgekuwa
+   print!("{} ", filepointer.byte_offset);
   }
 
   println!("{}", data2print);
