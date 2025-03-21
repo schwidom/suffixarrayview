@@ -381,6 +381,14 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   }
  };
 
+ let offset_alignment_base = {
+  if args.left || args.right {
+   filedata.iter().map(|x| format!("{}", x.len()).len()).max()
+  } else {
+   None
+  }
+ };
+
  // output
  for filepointer in filepointers {
   // let r = [filepointer.byte_offset..max( filepointer.byte_offset, min(usize
@@ -445,7 +453,11 @@ pub fn main() -> Result<(), Box<dyn Error>> {
 
   if args.offset {
    // xulmgekuwa
-   print!("{} ", filepointer.byte_offset);
+   let toprint = format!("{}", filepointer.byte_offset);
+   if let Some(oab) = offset_alignment_base {
+    print!("{}", " ".repeat(oab - toprint.chars().count()))
+   }
+   print!("{} ", toprint);
   }
 
   println!("{}", data2print);
