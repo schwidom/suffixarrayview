@@ -1,6 +1,7 @@
 
 The suffixarrayview creates a view of an internally created suffix array from one or more files.
 
+
 Usage: suffixarrayview [OPTIONS] [FILES]...
 
 Arguments:
@@ -9,8 +10,9 @@ Arguments:
 Options:
   -r, --right                    align the output ro the right
   -l, --left                     align the output to the left -l and -r is treated as -l
-  -f, --filename                 shows the filenames
   -i, --index                    shows the filename indices
+  -f, --filename                 shows the filenames
+  -o, --offset                   offset in bytes
   -w, --width <WIDTH>            maximum dataset length in chars / bytes, default is unlimited
   -b, --binary                   binary mode, default is UTF8 mode
   -t, --tokenregex <TOKENREGEX>  default is every char / byte, defines the start of all suffixes
