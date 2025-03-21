@@ -491,6 +491,15 @@ pub fn main() -> Result<(), Box<dyn Error>> {
 
   // gxqxpkgasa
   if let Some(d2p) = data2print_previous {
+   let d2p = format!("{}", d2p);
+
+   if !args.binary && (args.left || args.right) {
+    if let Some(prev) = args.previous {
+     let rep = if prev > d2p.len() { prev - d2p.len() } else { 0 };
+     print!("{}", " ".repeat(rep));
+    }
+   }
+
    print!("{} ", d2p);
   }
 
