@@ -52,11 +52,12 @@ struct Args {
  #[arg(short, long, help = "offset in bytes")]
  offset: bool,
 
- #[arg(short, long)]
+ // tevwc0mwpk
+ #[arg(short, long, help = "shows the data before the output datapoint")]
  previous: Option<usize>,
 
  // gxqxpkgasa
- #[arg(short, long)]
+ #[arg(short, long, help = "separator between previous data and data")]
  separator: Option<String>,
 
  #[arg(
@@ -398,7 +399,28 @@ pub fn main() -> Result<(), Box<dyn Error>> {
 
  // output
  for filepointer in filepointers {
-  // let r = [filepointer.byte_offset..max( filepointer.byte_offset, min(usize
+  let data2print_previous = match args.previous {
+   Some(prev) => Some(match filepointer.fdata {
+    // TODO : hex output
+    FData::B(b) => {
+     let r_start = if filepointer.byte_offset > prev { filepointer.byte_offset - prev } else { 0 };
+     format!("{:?}", &b.data[r_start..filepointer.byte_offset])
+    }
+    FData::S(s) => {
+     let co = filepointer.char_offset();
+     let r_start = s.char_to_byte_offset(if co > prev { co - prev } else { 0 });
+
+     format!(
+      "{}",
+      s.data[r_start..filepointer.byte_offset]
+       .to_string()
+       .replace("\n", " ")
+     )
+    }
+   }),
+   None => None,
+  };
+
   let data2print = match filepointer.fdata {
    // TODO : hex output
    FData::B(b) => {
@@ -465,6 +487,11 @@ pub fn main() -> Result<(), Box<dyn Error>> {
     print!("{}", " ".repeat(oab - toprint.chars().count()))
    }
    print!("{} ", toprint);
+  }
+
+  // gxqxpkgasa
+  if let Some(d2p) = data2print_previous {
+   print!("{} ", d2p);
   }
 
   if let Some(sep) = &args.separator {
