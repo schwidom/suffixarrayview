@@ -52,6 +52,13 @@ struct Args {
  #[arg(short, long, help = "offset in bytes")]
  offset: bool,
 
+ #[arg(short, long)]
+ previous: Option<usize>,
+
+ // gxqxpkgasa
+ #[arg(short, long)]
+ separator: Option<String>,
+
  #[arg(
   short,
   long,
@@ -460,12 +467,16 @@ pub fn main() -> Result<(), Box<dyn Error>> {
    print!("{} ", toprint);
   }
 
+  if let Some(sep) = &args.separator {
+   // gxqxpkgasa
+   print!("{} ", sep);
+  }
+
   println!("{}", data2print);
  }
 
  Ok(())
 }
-
 #[cfg(test)]
 mod tests {
  use crate::libmain::FileName;
