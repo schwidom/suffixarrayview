@@ -1,0 +1,4 @@
+Sa 22. Mär 14:28:16 CET 2025
+
+Errorhandling verbessern (mehr unixish : weitermachen, auch wenn Dateien Fehlen, 0 Dateien erlauben)
+
