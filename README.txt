@@ -18,6 +18,7 @@ Options:
   -b, --binary                   binary mode, default is UTF8 mode
   -t, --tokenregex <TOKENREGEX>  default is every char / byte, defines the start of all suffixes
   -v, --verbose                  
+      --nosort                   don't sort
   -h, --help                     Print help
   -V, --version                  Print version
 
