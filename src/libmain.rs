@@ -158,7 +158,13 @@ struct FDataString<'a> {
 
 impl<'a> FDataBinary<'a> {
  fn new(fln: FileName<'a>) -> Result<Self, Box<dyn Error>> {
-  let data = read(&fln.filename)?;
+  let data = match read(&fln.filename) {
+   Ok(value) => value,
+   Err(e) => {
+    eprintln!("{} : {}", &fln.filename, e);
+    exit(1);
+   }
+  };
   Ok(Self { fln, data })
  }
 
@@ -183,7 +189,13 @@ impl<'a> FDataBinary<'a> {
 
 impl<'a> FDataString<'a> {
  fn new(fln: FileName<'a>) -> Result<Self, Box<dyn Error>> {
-  let data = read_to_string(&fln.filename)?;
+  let data = match read_to_string(&fln.filename) {
+   Ok(value) => value,
+   Err(e) => {
+    eprintln!("{} : {}", &fln.filename, e);
+    exit(1);
+   }
+  };
   Self::from_bogus(fln, data)
  }
 

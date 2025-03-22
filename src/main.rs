@@ -1,5 +1,7 @@
+use std::error::Error;
+
 use suffixarrayview::libmain;
 
-fn main() {
- libmain::main();
+fn main() -> Result<(), Box<dyn Error>> {
+ libmain::main()
 }
