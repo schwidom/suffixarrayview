@@ -92,6 +92,9 @@ struct Args {
  #[arg(short, long)]
  verbose: bool,
 
+ #[arg(long, help = "don't sort")]
+ nosort: bool,
+
  #[arg()]
  files: Vec<String>,
 }
@@ -364,16 +367,18 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   })
   .collect::<Vec<FilePointer>>();
 
- if args.verbose {
-  eprintln!("sorting");
- }
+ if !args.nosort {
+  if args.verbose {
+   eprintln!("sorting");
+  }
 
- filepointers.sort_by(|a, b| match (&a.fdata, &b.fdata) {
-  (FData::B(a1), FData::B(b1)) => a1.data[a.byte_offset..].cmp(&b1.data[b.byte_offset..]),
-  (FData::B(a1), FData::S(b1)) => Less,
-  (FData::S(a1), FData::B(b1)) => Greater,
-  (FData::S(a1), FData::S(b1)) => a1.data[a.byte_offset..].cmp(&b1.data[b.byte_offset..]),
- });
+  filepointers.sort_by(|a, b| match (&a.fdata, &b.fdata) {
+   (FData::B(a1), FData::B(b1)) => a1.data[a.byte_offset..].cmp(&b1.data[b.byte_offset..]),
+   (FData::B(a1), FData::S(b1)) => Less,
+   (FData::S(a1), FData::B(b1)) => Greater,
+   (FData::S(a1), FData::S(b1)) => a1.data[a.byte_offset..].cmp(&b1.data[b.byte_offset..]),
+  });
+ }
 
  let alignments = {
   if args.right || args.left {

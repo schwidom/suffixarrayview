@@ -1,6 +1,6 @@
 [package]
 name = "suffixarrayview"
-version = "0.1.13"
+version = "0.1.14"
 edition = "2024"
 authors = ["Frank Schwidom"]
 description = "Creates a view of a suffix array"
